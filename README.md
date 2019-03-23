@@ -1,9 +1,3 @@
-gleam_elli
-=====
+# gleam_experimental_elli
 
-An OTP library
-
-Build
------
-
-    $ rebar3 compile
+Experimental Gleam bindings to the Elli Erlang web server

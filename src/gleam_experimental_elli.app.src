@@ -1,4 +1,4 @@
-{application, gleam_elli,
+{application, gleam_experimental_elli,
  [{description, "An OTP library"},
   {vsn, "0.1.0"},
   {registered, []},
