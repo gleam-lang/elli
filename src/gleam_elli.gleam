@@ -70,6 +70,8 @@ pub fn query_string(req) {
   }
 }
 
+pub external fn uri_decode(String) -> String = "elli_request" "uri_decode";
+
 // pub type Options =
 //   {
 //     port = Int,

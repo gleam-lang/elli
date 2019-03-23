@@ -1,7 +1,7 @@
 -module(gleam_elli).
 -compile(no_auto_import).
 
--export([method/1, path/1, raw_path/1, headers/1, body/1, query_string/1]).
+-export([method/1, path/1, raw_path/1, headers/1, body/1, query_string/1, uri_decode/1]).
 
 erl_query_string(A) ->
     elli_request:query_str(A).
@@ -29,3 +29,6 @@ query_string(Req) ->
         S ->
             {ok, S}
     end.
+
+uri_decode(A) ->
+    elli_request:uri_decode(A).
