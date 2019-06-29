@@ -1,4 +1,4 @@
--module(gleam_elli).
+-module(gleam@elli).
 -compile(no_auto_import).
 
 -export([method/1, path/1, raw_path/1, headers/1, body/1, query_string/1, uri_decode/1]).
