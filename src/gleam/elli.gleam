@@ -1,13 +1,23 @@
 import gleam/http
 import gleam/any
 import gleam/result
+import gleam/iodata
 
 // The Elli request object. Contains all information about the
 // incoming HTTP request.
 //
 pub external type Request;
 
-// API
+pub struct Header {
+  name: String
+  value: String
+}
+
+pub struct Response {
+  status: Int
+  headers: List(Header)
+  body: iodata.Iodata
+}
 
 // Get the query string for the request. Returns `Error` string if
 // request has no query.
@@ -36,11 +46,6 @@ pub external fn path(Request) -> List(String)
 //
 pub external fn raw_path(Request) -> String
   = "elli_request" "raw_path";
-
-pub struct Header {
-  name: String
-  value: String
-}
 
 // Get the request headers.
 //
