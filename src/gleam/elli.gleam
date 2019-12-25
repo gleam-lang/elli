@@ -1,5 +1,5 @@
 import gleam/http
-import gleam/any
+import gleam/dynamic
 import gleam/result
 import gleam/iodata
 
@@ -8,16 +8,14 @@ import gleam/iodata
 //
 pub external type Request;
 
-pub struct Header {
-  name: String
-  value: String
-}
-
-pub struct Response {
-  status: Int
-  headers: List(Header)
-  body: iodata.Iodata
-}
+// TODO: behaviour wrapper
+// pub type Response {
+//   Response(
+//     status: Int,
+//     headers: List(tuple(String, String)),
+//     body: iodata.Iodata,
+//   )
+// }
 
 // Get the query string for the request. Returns `Error` string if
 // request has no query.
@@ -25,7 +23,7 @@ pub struct Response {
 pub external fn query_string(Request) -> String
   = "elli_request" "query_str";
 
-external fn get_method(Request) -> any.Any
+external fn get_method(Request) -> dynamic.Dynamic
   = "elli_request" "method";
 
 // Get the request HTTP method.
@@ -49,7 +47,7 @@ pub external fn raw_path(Request) -> String
 
 // Get the request headers.
 //
-pub external fn headers(Request) -> List(Header)
+pub external fn headers(Request) -> List(tuple(String, String))
   = "elli_request" "headers";
 
 // Get the request body.
