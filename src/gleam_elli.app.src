@@ -1,5 +1,5 @@
-{application, gleam_experimental_elli,
- [{description, "An OTP library"},
+{application, gleam_elli,
+ [{description, "Gleam bindings to the Elli HTTP server"},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,
