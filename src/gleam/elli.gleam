@@ -59,7 +59,7 @@ pub external fn uri_decode(String) -> String = "elli_request" "uri_decode";
 
 type Option {
   Callback(Atom)
-  CallbackArg(fn(Request) -> Response)
+  CallbackArgs(fn(Request) -> Response)
   Port(Int)
 };
 
@@ -72,7 +72,7 @@ pub fn start_link(port: Int, handler: fn(Request) -> Response)
   erl_start_link([
     Port(port),
     Callback(atom.create_from_string("gleam@elli")),
-    CallbackArg(handler),
+    CallbackArgs(handler),
   ])
 }
 
