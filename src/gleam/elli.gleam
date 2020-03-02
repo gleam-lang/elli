@@ -17,6 +17,9 @@ pub type Response {
   )
 }
 
+pub type Header =
+  tuple(String, String)
+
 // Get the query string for the request. Returns `Error` string if
 // request has no query.
 //
@@ -47,7 +50,7 @@ pub external fn raw_path(Request) -> String
 
 // Get the request headers.
 //
-pub external fn headers(Request) -> List(tuple(String, String))
+pub external fn headers(Request) -> List(Header)
   = "elli_request" "headers";
 
 // Get the request body.
@@ -82,7 +85,7 @@ pub fn start_link(port: Int, handler: fn(Request) -> Response)
 pub fn handle(
   request: Request,
   handler: fn(Request) -> Response,
-) -> tuple(Int, List(tuple(String, String)), String)
+) -> tuple(Int, List(Header), String)
 {
   let Response(status, headers, body) = handler(request)
   tuple(status, headers, body)
