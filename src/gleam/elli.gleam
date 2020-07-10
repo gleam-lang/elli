@@ -41,7 +41,7 @@ external fn get_dynamic_method(ElliRequest) -> Dynamic =
 fn get_method(req) {
   req
   |> get_dynamic_method
-  |> http.method_from_erlang
+  |> http.method_from_dynamic
   |> result.unwrap(http.Get)
 }
 

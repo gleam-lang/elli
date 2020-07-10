@@ -2,7 +2,7 @@
 [{<<"elli">>,{pkg,<<"elli">>,<<"3.2.0">>},0},
  {<<"gleam_http">>,
   {git,"https://github.com/gleam-lang/http",
-       {ref,"823e178a280c00aac6694c1a7c9edefb56657648"}},
+       {ref,"29fbddea16339528e76073ef2288459e17f63a72"}},
   0},
  {<<"gleam_otp">>,
   {git,"https://github.com/gleam-lang/otp",
