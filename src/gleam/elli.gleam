@@ -86,11 +86,11 @@ pub fn service_to_elli_handler(
 // TODO: test
 pub fn start(
   service: http.Service(BitString, BitBuilder),
-  port: Int,
+  on_port port_number: Int,
 ) -> StartResult(UnknownMessage) {
   erl_start_link(
     [
-      Port(port),
+      Port(port_number),
       Callback(atom.create_from_string("gleam_elli_native")),
       CallbackArgs(service_to_elli_handler(service)),
     ],

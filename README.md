@@ -23,6 +23,6 @@ pub fn my_service(req: http.Request) -> http.Response {
 // Start it on port 3000!
 //
 pub fn start() {
-  elli.start(my_service, 3000)
+  elli.start(my_service, on_port: 3000)
 }
 ```
