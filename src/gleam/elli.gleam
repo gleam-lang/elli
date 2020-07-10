@@ -7,10 +7,13 @@ import gleam/result
 import gleam/bit_builder.{BitBuilder}
 import gleam/bit_string
 
-external type ElliRequest
+pub external type ElliRequest
 
-type ElliResponse =
+pub type ElliResponse =
   tuple(Int, List(http.Header), BitBuilder)
+
+pub type ElliHandler =
+  fn(ElliRequest) -> ElliResponse
 
 type StartLinkOption {
   Callback(Atom)
@@ -58,11 +61,12 @@ external fn get_query(ElliRequest) -> String =
 external fn get_path(ElliRequest) -> String =
   "elli_request" "raw_path"
 
-pub fn start(
+// TODO: document
+// TODO: test
+pub fn service_to_elli_handler(
   service: http.Service(BitString, BitBuilder),
-  port: Int,
-) -> StartResult(UnknownMessage) {
-  let handler = fn(req) {
+) -> ElliHandler {
+  fn(req) {
     let resp = http.Request(
         method: get_method(req),
         host: get_host(req),
@@ -76,12 +80,19 @@ pub fn start(
     let http.Response(status, headers, body) = resp
     tuple(status, headers, body)
   }
+}
 
+// TODO: document
+// TODO: test
+pub fn start(
+  service: http.Service(BitString, BitBuilder),
+  port: Int,
+) -> StartResult(UnknownMessage) {
   erl_start_link(
     [
       Port(port),
       Callback(atom.create_from_string("gleam_elli_native")),
-      CallbackArgs(handler),
+      CallbackArgs(service_to_elli_handler(service)),
     ],
   )
 }
