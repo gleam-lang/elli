@@ -1,97 +1,87 @@
 import gleam/atom.{Atom}
 import gleam/dynamic.{Dynamic}
-import gleam/otp/process.{Pid, UnknownMessage}
+import gleam/otp/process.{StartResult, UnknownMessage}
 import gleam/http
+import gleam/option
 import gleam/result
+import gleam/bit_builder.{BitBuilder}
+import gleam/bit_string
 
-// The Elli request object. Contains all information about the
-// incoming HTTP request.
-//
-pub external type Request;
+external type ElliRequest
 
-pub type Response {
-  Response(
-    status: Int,
-    headers: List(tuple(String, String)),
-    body: String,
-  )
-}
+type ElliResponse =
+  tuple(Int, List(http.Header), BitBuilder)
 
-pub type Header =
-  tuple(String, String)
-
-// Get the query string for the request. Returns `Error` string if
-// request has no query.
-//
-pub external fn query_string(Request) -> String
-  = "elli_request" "query_str";
-
-external fn get_method(Request) -> Dynamic
-  = "elli_request" "method";
-
-// Get the request HTTP method.
-//
-pub fn method(request: Request) -> http.Method {
-  request
-  |> get_method
-  |> http.method_from_erlang
-  |> result.unwrap(_, http.Get)
-}
-
-// Get the request path segments.
-//
-pub external fn path(Request) -> List(String)
-  = "elli_request" "path";
-
-// Get the request `raw_path", i.e. not split or parsed for query params.
-//
-pub external fn raw_path(Request) -> String
-  = "elli_request" "raw_path";
-
-// Get the request headers.
-//
-pub external fn headers(Request) -> List(Header)
-  = "elli_request" "headers";
-
-// Get the request body.
-//
-pub external fn body(Request) -> String
-  = "elli_request" "body";
-
-pub external fn uri_decode(String) -> String = "elli_request" "uri_decode";
-
-type Option {
+type StartLinkOption {
   Callback(Atom)
-  CallbackArgs(fn(Request) -> Response)
+  CallbackArgs(fn(ElliRequest) -> ElliResponse)
   Port(Int)
-};
-
-external fn erl_start_link(List(Option)) -> Result(Pid(UnknownMessage), String)
-  = "elli" "start_link";
-
-pub fn start_link(port: Int, handler: fn(Request) -> Response)
-  -> Result(Pid(UnknownMessage), String)
-{
-  erl_start_link([
-    Port(port),
-    Callback(atom.create_from_string("gleam@elli")),
-    CallbackArgs(handler),
-  ])
 }
 
-// Elli behaviour callbacks
+external fn erl_start_link(
+  List(StartLinkOption),
+) -> StartResult(UnknownMessage) =
+  "elli" "start_link"
 
-// nodoc
-pub fn handle(
-  request: Request,
-  handler: fn(Request) -> Response,
-) -> tuple(Int, List(Header), String)
-{
-  let Response(status, headers, body) = handler(request)
-  tuple(status, headers, body)
+external fn get_body(ElliRequest) -> BitString =
+  "elli_request" "body"
+
+external fn get_headers(ElliRequest) -> List(http.Header) =
+  "elli_request" "headers"
+
+external fn get_host(ElliRequest) -> String =
+  "elli_request" "host"
+
+external fn get_dynamic_method(ElliRequest) -> Dynamic =
+  "elli_request" "method"
+
+fn get_method(req) {
+  req
+  |> get_dynamic_method
+  |> http.method_from_erlang
+  |> result.unwrap(http.Get)
 }
 
-// nodoc
-pub fn handle_event(_event: Dynamic, _data: Dynamic, _args: Dynamic) -> Atom {
-  atom.create_from_string("ok")
+external fn get_dynamic_port(ElliRequest) -> Dynamic =
+  "elli_request" "port"
+
+fn get_port(req) {
+  req
+  |> get_dynamic_port
+  |> dynamic.int
+  |> option.from_result
+}
+
+external fn get_query(ElliRequest) -> String =
+  "elli_request" "query_str"
+
+external fn get_path(ElliRequest) -> String =
+  "elli_request" "raw_path"
+
+pub fn start(
+  service: http.Service(BitString, BitBuilder),
+  port: Int,
+) -> StartResult(UnknownMessage) {
+  let handler = fn(req) {
+    let resp = http.Request(
+        method: get_method(req),
+        host: get_host(req),
+        port: get_port(req),
+        path: get_path(req),
+        query: option.Some(get_query(req)),
+        headers: get_headers(req),
+        body: get_body(req),
+      )
+      |> service
+    let http.Response(status, headers, body) = resp
+    tuple(status, headers, body)
+  }
+
+  erl_start_link(
+    [
+      Port(port),
+      Callback(atom.create_from_string("gleam_elli_native")),
+      CallbackArgs(handler),
+    ],
+  )
 }
