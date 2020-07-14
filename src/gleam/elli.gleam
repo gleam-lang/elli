@@ -4,6 +4,7 @@ import gleam/otp/process.{StartResult, UnknownMessage}
 import gleam/http
 import gleam/option
 import gleam/result
+import gleam/string
 import gleam/bit_builder.{BitBuilder}
 import gleam/bit_string
 
@@ -55,6 +56,21 @@ fn get_port(req) {
   |> option.from_result
 }
 
+external fn get_dynamic_scheme(ElliRequest) -> Dynamic =
+  "elli_request" "scheme"
+
+fn get_scheme(req) -> http.Scheme {
+  let scheme = req
+    |> get_dynamic_port
+    |> dynamic.string
+    |> result.unwrap("")
+    |> string.lowercase
+  case scheme {
+    "https" -> http.Https
+    _ -> http.Http
+  }
+}
+
 external fn get_query(ElliRequest) -> String =
   "elli_request" "query_str"
 
@@ -68,6 +84,7 @@ pub fn service_to_elli_handler(
 ) -> ElliHandler {
   fn(req) {
     let resp = http.Request(
+        scheme: get_scheme(req),
         method: get_method(req),
         host: get_host(req),
         port: get_port(req),
