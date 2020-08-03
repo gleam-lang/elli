@@ -56,7 +56,7 @@ external fn get_dynamic_scheme(ElliRequest) -> Dynamic =
 
 fn get_scheme(req) -> http.Scheme {
   let scheme = req
-    |> get_dynamic_port
+    |> get_dynamic_scheme
     |> dynamic.string
     |> result.unwrap("")
     |> string.lowercase
