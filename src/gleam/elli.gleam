@@ -1,6 +1,6 @@
 import gleam/atom.{Atom}
 import gleam/dynamic.{Dynamic}
-import gleam/otp/process.{StartResult, UnknownMessage}
+import gleam/otp/process.{Pid}
 import gleam/http
 import gleam/option
 import gleam/result
@@ -13,18 +13,13 @@ external type ElliRequest
 type ElliResponse =
   tuple(Int, List(http.Header), BitBuilder)
 
-type ElliHandler =
-  fn(ElliRequest) -> ElliResponse
-
 type StartLinkOption {
   Callback(Atom)
   CallbackArgs(fn(ElliRequest) -> ElliResponse)
   Port(Int)
 }
 
-external fn erl_start_link(
-  List(StartLinkOption),
-) -> StartResult(UnknownMessage) =
+external fn erl_start_link(List(StartLinkOption)) -> Result(Pid, Dynamic) =
   "elli" "start_link"
 
 external fn get_body(ElliRequest) -> BitString =
@@ -81,7 +76,7 @@ external fn get_path(ElliRequest) -> String =
 // TODO: test
 fn service_to_elli_handler(
   service: http.Service(BitString, BitBuilder),
-) -> ElliHandler {
+) -> fn(ElliRequest) -> ElliResponse {
   fn(req) {
     let resp = http.Request(
         scheme: get_scheme(req),
@@ -99,12 +94,13 @@ fn service_to_elli_handler(
   }
 }
 
+// TODO: refine error type
 // TODO: document
 // TODO: test
 pub fn start(
   service: http.Service(BitString, BitBuilder),
   on_port number: Int,
-) -> StartResult(UnknownMessage) {
+) -> Result(Pid, Dynamic) {
   erl_start_link(
     [
       Port(number),
