@@ -1,10 +1,13 @@
 {application, gleam_elli,
  [{description, "A Gleam HTTP service adapter for the Elli web server"},
-  {vsn, "0.1.0"},
+  {vsn, "0.1.1"},
   {registered, []},
   {applications,
    [kernel,
-    stdlib
+    stdlib,
+    gleam_stdlib,
+    gleam_http,
+    elli
    ]},
   {env,[]},
   {modules, []},
