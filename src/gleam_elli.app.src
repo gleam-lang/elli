@@ -13,5 +13,5 @@
   {modules, []},
 
   {licenses, ["Apache 2.0"]},
-  {links, [{"GitHub", "https://github.com/gleam-experiments/elli"}]}
+  {links, [{"GitHub", "https://github.com/gleam-lang/elli"}]}
  ]}.
