@@ -1,6 +1,8 @@
 import gleam/atom.{Atom}
 import gleam/dynamic.{Dynamic}
 import gleam/otp/process.{Pid}
+import gleam/otp/actor.{StartResult}
+import gleam/otp/supervisor
 import gleam/http
 import gleam/option
 import gleam/result
@@ -55,7 +57,8 @@ external fn get_dynamic_scheme(ElliRequest) -> Dynamic =
   "elli_request" "scheme"
 
 fn get_scheme(req) -> http.Scheme {
-  let scheme = req
+  let scheme =
+    req
     |> get_dynamic_scheme
     |> dynamic.string
     |> result.unwrap("")
@@ -78,7 +81,8 @@ fn service_to_elli_handler(
   service: http.Service(BitString, BitBuilder),
 ) -> fn(ElliRequest) -> ElliResponse {
   fn(req) {
-    let resp = http.Request(
+    let resp =
+      http.Request(
         scheme: get_scheme(req),
         method: get_method(req),
         host: get_host(req),
@@ -100,12 +104,12 @@ fn service_to_elli_handler(
 pub fn start(
   service: http.Service(BitString, BitBuilder),
   on_port number: Int,
-) -> Result(Pid, Dynamic) {
-  erl_start_link(
-    [
-      Port(number),
-      Callback(atom.create_from_string("gleam_elli_native")),
-      CallbackArgs(service_to_elli_handler(service)),
-    ],
-  )
+) -> StartResult(a) {
+  [
+    Port(number),
+    Callback(atom.create_from_string("gleam_elli_native")),
+    CallbackArgs(service_to_elli_handler(service)),
+  ]
+  |> erl_start_link
+  |> supervisor.wrap_erlang_start_result
 }
