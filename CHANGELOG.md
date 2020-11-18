@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The header keys are now converted to lowercase.
+
 ## v0.2.0 - 2020-11-06
 
 - The `start` function now returns a Gleam OTP `StartResult`.
