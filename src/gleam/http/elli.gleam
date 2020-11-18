@@ -4,7 +4,9 @@ import gleam/otp/process.{Pid}
 import gleam/otp/actor.{StartResult}
 import gleam/otp/supervisor
 import gleam/http
+import gleam/list
 import gleam/option
+import gleam/pair
 import gleam/result
 import gleam/string
 import gleam/bit_builder.{BitBuilder}
@@ -75,6 +77,10 @@ external fn get_query(ElliRequest) -> String =
 external fn get_path(ElliRequest) -> String =
   "elli_request" "raw_path"
 
+fn convert_header_to_lowercase(header: http.Header) -> http.Header {
+  pair.map_first(header, fn(key) { string.lowercase(key) })
+}
+
 // TODO: document
 // TODO: test
 fn service_to_elli_handler(
@@ -89,7 +95,7 @@ fn service_to_elli_handler(
         port: get_port(req),
         path: get_path(req),
         query: option.Some(get_query(req)),
-        headers: get_headers(req),
+        headers: get_headers(req) |> list.map(convert_header_to_lowercase),
         body: get_body(req),
       )
       |> service
