@@ -117,5 +117,5 @@ pub fn start(
     CallbackArgs(service_to_elli_handler(service)),
   ]
   |> erl_start_link
-  |> supervisor.wrap_erlang_start_result
+  |> supervisor.from_erlang_start_result
 }
