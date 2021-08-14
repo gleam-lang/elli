@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.3.0 - 2021-08-14
 
 - The header keys are now converted to lowercase.
 - Updated to work with gleam/http v2.0.
