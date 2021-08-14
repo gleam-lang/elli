@@ -15,7 +15,7 @@ import gleam/bit_string
 external type ElliRequest
 
 type ElliResponse =
-  tuple(Int, List(http.Header), BitBuilder)
+  #(Int, List(http.Header), BitBuilder)
 
 type StartLinkOption {
   Callback(Atom)
@@ -95,12 +95,13 @@ fn service_to_elli_handler(
         port: get_port(req),
         path: get_path(req),
         query: option.Some(get_query(req)),
-        headers: get_headers(req) |> list.map(convert_header_to_lowercase),
+        headers: get_headers(req)
+        |> list.map(convert_header_to_lowercase),
         body: get_body(req),
       )
       |> service
     let http.Response(status, headers, body) = resp
-    tuple(status, headers, body)
+    #(status, headers, body)
   }
 }
 
