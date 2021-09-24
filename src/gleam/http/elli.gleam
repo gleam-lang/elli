@@ -1,4 +1,4 @@
-import gleam/atom.{Atom}
+import gleam/erlang/atom.{Atom}
 import gleam/dynamic.{Dynamic}
 import gleam/otp/process.{Pid}
 import gleam/otp/actor.{StartResult}
