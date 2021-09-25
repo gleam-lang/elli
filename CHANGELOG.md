@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.0 - 2021-09-25
+
+- Updated for Gleam v0.17.0.
+
 ## v0.3.0 - 2021-08-14
 
 - The header keys are now converted to lowercase.
