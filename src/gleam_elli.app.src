@@ -13,5 +13,6 @@
   {modules, []},
 
   {licenses, ["Apache 2.0"]},
-  {links, [{"GitHub", "https://github.com/gleam-lang/elli"}]}
+  {links, [{"GitHub", "https://github.com/gleam-lang/elli"}]},
+  {include_files, ["gleam.toml", "gen"]}
  ]}.
