@@ -15,6 +15,4 @@ logs
 _build
 .idea
 *.iml
-rebar3.crashdump
-gen
-doc
+build
