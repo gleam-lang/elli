@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.0.0 - Unreleased
+## v1.0.0 - 2022-01-29
 
 - Updated for `gleam_http` v3.0.0.
 

@@ -1,5 +1,5 @@
 name = "gleam_elli"
-version = "0.5.0"
+version = "1.0.0"
 licences = ["Apache-2.0"]
 description = "Run Gleam HTTP services with the Elli web server"
 
