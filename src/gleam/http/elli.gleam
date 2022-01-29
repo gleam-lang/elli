@@ -4,6 +4,9 @@ import gleam/otp/process.{Pid}
 import gleam/otp/actor.{StartResult}
 import gleam/otp/supervisor
 import gleam/http
+import gleam/http/service.{Service}
+import gleam/http/request.{Request}
+import gleam/http/response.{Response}
 import gleam/list
 import gleam/option
 import gleam/pair
@@ -84,11 +87,11 @@ fn convert_header_to_lowercase(header: http.Header) -> http.Header {
 // TODO: document
 // TODO: test
 fn service_to_elli_handler(
-  service: http.Service(BitString, BitBuilder),
+  service: Service(BitString, BitBuilder),
 ) -> fn(ElliRequest) -> ElliResponse {
   fn(req) {
     let resp =
-      http.Request(
+      Request(
         scheme: get_scheme(req),
         method: get_method(req),
         host: get_host(req),
@@ -100,7 +103,7 @@ fn service_to_elli_handler(
         body: get_body(req),
       )
       |> service
-    let http.Response(status, headers, body) = resp
+    let Response(status, headers, body) = resp
     #(status, headers, body)
   }
 }
@@ -109,7 +112,7 @@ fn service_to_elli_handler(
 // TODO: document
 // TODO: test
 pub fn start(
-  service: http.Service(BitString, BitBuilder),
+  service: Service(BitString, BitBuilder),
   on_port number: Int,
 ) -> StartResult(a) {
   [
