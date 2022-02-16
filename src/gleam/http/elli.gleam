@@ -80,12 +80,13 @@ external fn get_query(ElliRequest) -> String =
 external fn get_path(ElliRequest) -> String =
   "elli_request" "raw_path"
 
+external fn await_shutdown(process.Pid) -> Nil =
+  "gleam_elli_native" "await_shutdown"
+
 fn convert_header_to_lowercase(header: http.Header) -> http.Header {
   pair.map_first(header, fn(key) { string.lowercase(key) })
 }
 
-// TODO: document
-// TODO: test
 fn service_to_elli_handler(
   service: Service(BitString, BitBuilder),
 ) -> fn(ElliRequest) -> ElliResponse {
@@ -122,4 +123,17 @@ pub fn start(
   ]
   |> erl_start_link
   |> supervisor.from_erlang_start_result
+}
+
+pub fn become(
+  service: Service(BitString, BitBuilder),
+  on_port number: Int,
+) -> Result(Nil, actor.StartError) {
+  case start(service, number) {
+    Ok(sender) -> {
+      let pid = process.pid(sender)
+      Ok(await_shutdown(pid))
+    }
+    Error(e) -> Error(e)
+  }
 }
