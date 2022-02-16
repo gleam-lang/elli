@@ -109,9 +109,12 @@ fn service_to_elli_handler(
   }
 }
 
-// TODO: refine error type
-// TODO: document
-// TODO: test
+/// Start a new Elli web server process which runs concurrently to the current
+/// process.
+///
+/// If you want to run the web server but don't need to do anything else with
+/// the current process you may want to use the `become` function instead.
+///
 pub fn start(
   service: Service(BitString, BitBuilder),
   on_port number: Int,
@@ -125,6 +128,11 @@ pub fn start(
   |> supervisor.from_erlang_start_result
 }
 
+/// Start an Elli web server with the current process.
+///
+/// This function returns if the Elli web server fails to start or if it was
+/// shut down after successfully starting.
+///
 pub fn become(
   service: Service(BitString, BitBuilder),
   on_port number: Int,
