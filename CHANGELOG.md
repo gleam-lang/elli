@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.0 - Unreleased
+## v1.1.0 - 2022-02-16
 
 - The `elli` module gains the `become` function.
 
