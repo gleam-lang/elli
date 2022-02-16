@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.0 - Unreleased
+
+- The `elli` module gains the `become` function.
+
 ## v1.0.0 - 2022-01-29
 
 - Updated for `gleam_http` v3.0.0.
