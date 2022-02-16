@@ -1,4 +1,4 @@
-# Gleam Elli!
+# Elli
 
 A Gleam HTTP service adapter for the Elli web server.
 
