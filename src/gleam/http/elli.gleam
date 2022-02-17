@@ -26,6 +26,9 @@ type StartLinkOption {
   Port(Int)
 }
 
+external fn split(String, List(String)) -> List(String) =
+  "binary" "split"
+
 external fn erl_start_link(List(StartLinkOption)) -> Result(Pid, Dynamic) =
   "elli" "start_link"
 
@@ -36,7 +39,7 @@ external fn get_headers(ElliRequest) -> List(http.Header) =
   "elli_request" "headers"
 
 external fn get_host(ElliRequest) -> String =
-  "elli_request" "host"
+  "gleam_elli_native" "get_host"
 
 external fn get_dynamic_method(ElliRequest) -> Dynamic =
   "elli_request" "method"
@@ -77,8 +80,16 @@ fn get_scheme(req) -> http.Scheme {
 external fn get_query(ElliRequest) -> String =
   "elli_request" "query_str"
 
-external fn get_path(ElliRequest) -> String =
+external fn get_raw_path(ElliRequest) -> String =
   "elli_request" "raw_path"
+
+fn get_path(request: ElliRequest) -> String {
+  let raw_path = get_raw_path(request)
+  raw_path
+  |> split(["#", "?"])
+  |> list.first
+  |> result.unwrap(raw_path)
+}
 
 external fn await_shutdown(process.Pid) -> Nil =
   "gleam_elli_native" "await_shutdown"
