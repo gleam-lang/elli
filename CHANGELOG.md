@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.1.1 - Unreleased
+
+- Fixed a bug where the request host field could have an incorrect value.
+- Fixed a bug where the request path field could also include the query.
+
 ## v1.1.0 - 2022-02-16
 
 - The `elli` module gains the `become` function.
