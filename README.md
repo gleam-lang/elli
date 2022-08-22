@@ -2,7 +2,7 @@
 
 A Gleam HTTP service adapter for the Elli web server.
 
-```rust
+```gleam
 import gleam/http/elli
 import gleam/http/request.{Request}
 import gleam/http/response.{Response}
