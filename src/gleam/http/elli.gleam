@@ -1,8 +1,6 @@
 import gleam/erlang/atom.{Atom}
 import gleam/dynamic.{Dynamic}
-import gleam/otp/process.{Pid}
-import gleam/otp/actor.{StartResult}
-import gleam/otp/supervisor
+import gleam/erlang/process.{Pid}
 import gleam/http
 import gleam/http/service.{Service}
 import gleam/http/request.{Request}
@@ -13,7 +11,6 @@ import gleam/pair
 import gleam/result
 import gleam/string
 import gleam/bit_builder.{BitBuilder}
-import gleam/bit_string
 
 external type ElliRequest
 
@@ -129,14 +126,13 @@ fn service_to_elli_handler(
 pub fn start(
   service: Service(BitString, BitBuilder),
   on_port number: Int,
-) -> StartResult(a) {
+) -> Result(Pid, Dynamic) {
   [
     Port(number),
     Callback(atom.create_from_string("gleam_elli_native")),
     CallbackArgs(service_to_elli_handler(service)),
   ]
   |> erl_start_link
-  |> supervisor.from_erlang_start_result
 }
 
 /// Start an Elli web server with the current process.
@@ -147,12 +143,8 @@ pub fn start(
 pub fn become(
   service: Service(BitString, BitBuilder),
   on_port number: Int,
-) -> Result(Nil, actor.StartError) {
-  case start(service, number) {
-    Ok(sender) -> {
-      let pid = process.pid(sender)
-      Ok(await_shutdown(pid))
-    }
-    Error(e) -> Error(e)
-  }
+) -> Result(Nil, Dynamic) {
+  service
+  |> start(number)
+  |> result.map(await_shutdown)
 }

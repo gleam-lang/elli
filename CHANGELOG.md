@@ -1,6 +1,10 @@
 # Changelog
 
-## v1.1.1 - Unreleased
+## v2.0.0 - Unreleased
+
+- Updated for `gleam_otp` v0.5.0.
+
+## v1.1.1 - 2022-02-17
 
 - Fixed a bug where the request host field could have an incorrect value.
 - Fixed a bug where the request path field could also include the query.
