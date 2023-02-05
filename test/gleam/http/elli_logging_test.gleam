@@ -88,9 +88,14 @@ pub fn log_masks_request_headers_test() {
 
   assert [err] = get_spied_reports(spy_name)
 
-  assert Ok(req) = get_request(err, Request)
+  assert Ok(logged_req) = get_request(err, Request)
 
-  req.headers
+  // check that we got the request back
+  logged_req.path
+  |> should.equal("/route/with/no/handler")
+
+  // but without the headers
+  logged_req.headers
   |> should.equal([])
 }
 
@@ -107,9 +112,14 @@ pub fn log_masks_request_body_test() {
 
   assert [err] = get_spied_reports(spy_name)
 
-  assert Ok(req) = get_request(err, Request)
+  assert Ok(logged_req) = get_request(err, Request)
 
-  req.body
+  // check that we got the request back
+  logged_req.path
+  |> should.equal("/route/with/no/handler")
+
+  // but without the body
+  logged_req.body
   |> should.equal(bit_string.from_string(""))
 }
 
