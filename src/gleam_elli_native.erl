@@ -9,24 +9,24 @@ handle(Req, Handler) ->
 
 handle_event(request_error, [Request, Error, Stacktrace], _) ->
     ?LOG_ERROR(#{
-        <<"message">> => <<"request handler had a runtime error">>,
-        <<"error">> => Error,
-        <<"request">> => Request,
-        <<"stacktrace">> => Stacktrace
+        message => <<"request handler had a runtime error">>,
+        error => Error,
+        request => Request,
+        stacktrace => Stacktrace
     });
 handle_event(request_throw, [Request, Exception, Stacktrace], _) ->
     ?LOG_ERROR(#{
-        <<"message">> => <<"request handler threw an exception">>,
-        <<"error">> => Exception,
-        <<"request">> => Request,
-        <<"stacktrace">> => Stacktrace
+        message => <<"request handler threw an exception">>,
+        error => Exception,
+        request => Request,
+        stacktrace => Stacktrace
     });
 handle_event(request_exit, [Request, Exit, Stacktrace], _) ->
     ?LOG_ERROR(#{
-        <<"message">> => <<"request handler exited">>,
-        <<"error">> => Exit,
-        <<"request">> => Request,
-        <<"stacktrace">> => Stacktrace
+        message => <<"request handler exited">>,
+        error => Exit,
+        request => Request,
+        stacktrace => Stacktrace
     });
 handle_event(_, _, _) ->
     ok.

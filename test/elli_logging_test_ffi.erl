@@ -44,7 +44,7 @@ get_spied_reports(IdBinary)->
                 fun
                     (#{ level := Level, msg := {report, Report}}) ->
                         %% massage to make it easier to use in tests
-                        {true, Report#{<<"level">> => atom_to_binary(Level)}};
+                        {true, Report#{level => atom_to_binary(Level)}};
                     (_) ->
                         false
                 end,
