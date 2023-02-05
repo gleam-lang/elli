@@ -1,6 +1,7 @@
 -module(gleam_elli_native).
 
 -include_lib("kernel/include/logger.hrl").
+-include_lib("elli/include/elli.hrl").
 
 -export([handle/2, handle_event/3, await_shutdown/1, get_host/1]).
 
@@ -11,21 +12,21 @@ handle_event(request_error, [Request, Error, Stacktrace], _) ->
     ?LOG_ERROR(#{
         message => <<"request handler had a runtime error">>,
         error => Error,
-        request => Request,
+        request => mask(Request),
         stacktrace => Stacktrace
     });
 handle_event(request_throw, [Request, Exception, Stacktrace], _) ->
     ?LOG_ERROR(#{
         message => <<"request handler threw an exception">>,
         error => Exception,
-        request => Request,
+        request => mask(Request),
         stacktrace => Stacktrace
     });
 handle_event(request_exit, [Request, Exit, Stacktrace], _) ->
     ?LOG_ERROR(#{
         message => <<"request handler exited">>,
         error => Exit,
-        request => Request,
+        request => mask(Request),
         stacktrace => Stacktrace
     });
 handle_event(_, _, _) ->
@@ -42,3 +43,6 @@ get_host(Request) ->
         undefined -> <<>>;
         Host when is_binary(Host) -> Host
     end.
+
+mask(Request) ->
+    Request#req{headers = [], body = <<>>}.
