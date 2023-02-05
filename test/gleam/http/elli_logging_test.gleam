@@ -1,3 +1,4 @@
+import gleam/bit_string
 import gleam/bit_builder.{BitBuilder}
 import gleam/dynamic.{DecodeError, Dynamic}
 import gleam/hackney
@@ -74,6 +75,44 @@ pub fn log_exit_test() {
   should.be_true(0 < exit_stack)
 }
 
+pub fn log_masks_request_headers_test() {
+  let port = 4715
+  assert Ok(_) = elli.start(bad_service, on_port: port)
+
+  let spy_name = "log_masks_request_test"
+  start_log_spy(spy_name)
+  silence_default_handler()
+
+  make_request(port, "/route/with/no/handler", "dont_care")
+  |> hackney.send
+
+  assert [err] = get_spied_reports(spy_name)
+
+  assert Ok(req) = get_request(err, Request)
+
+  req.headers
+  |> should.equal([])
+}
+
+pub fn log_masks_request_body_test() {
+  let port = 4716
+  assert Ok(_) = elli.start(bad_service, on_port: port)
+
+  let spy_name = "log_masks_request_body_test"
+  start_log_spy(spy_name)
+  silence_default_handler()
+
+  make_request(port, "/route/with/no/handler", "dont_care")
+  |> hackney.send
+
+  assert [err] = get_spied_reports(spy_name)
+
+  assert Ok(req) = get_request(err, Request)
+
+  req.body
+  |> should.equal(bit_string.from_string(""))
+}
+
 external fn start_log_spy(id: String) -> Nil =
   "elli_logging_test_ffi" "start_log_spy"
 
@@ -99,6 +138,7 @@ fn make_request(port: Int, path: String, message: String) {
   |> request.set_host("0.0.0.0")
   |> request.set_scheme(http.Http)
   |> request.set_port(port)
+  |> request.set_body("SECRET DATA")
 }
 
 fn get_string(
@@ -119,3 +159,17 @@ fn list_length(
   |> result.then(dynamic.shallow_list)
   |> result.map(list.length)
 }
+
+fn get_request(
+  report: Map(a, Dynamic),
+  key: a,
+) -> Result(Request(BitString), List(DecodeError)) {
+  map.get(report, key)
+  |> result.map_error(fn(_) { [] })
+  |> result.then(as_request)
+}
+
+external fn as_request(
+  something: Dynamic,
+) -> Result(Request(BitString), List(DecodeError)) =
+  "elli_logging_test_ffi" "as_request"
