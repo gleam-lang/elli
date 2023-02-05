@@ -54,8 +54,9 @@ get_spied_reports(IdBinary)->
     end.
 
 as_request({req, Method, _, _, _, Path, _, _, _, Headers, Body, _, _, _}) ->
+    BinaryPath = iolist_to_binary(lists:join(<<"/">>, [<<"">> | Path])),
     %% not all fields are used in the tests
-    {ok, {request, Method, Headers, Body, x, x, x, lists:join(<<"/">>, Path), x}};
+    {ok, {request, Method, Headers, Body, x, x, x, BinaryPath, x}};
 as_request(_) ->
     {error, [{decode_error, <<"a request tuple">>, <<"something else">>, []}]}.
 
