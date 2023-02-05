@@ -5,6 +5,7 @@
     bad_service/1,
     start_log_spy/1,
     silence_default_handler/0,
+    as_request/1,
     get_spied_reports/1
 ]).
 
@@ -51,6 +52,12 @@ get_spied_reports(IdBinary)->
                 LogEvents
             )
     end.
+
+as_request({req, Method, _, _, _, Path, _, _, _, Headers, Body, _, _, _}) ->
+    %% not all fields are used in the tests
+    {ok, {request, Method, Headers, Body, x, x, x, lists:join(<<"/">>, Path), x}};
+as_request(_) ->
+    {error, [{decode_error, <<"a request tuple">>, <<"something else">>, []}]}.
 
 log(LogEvent, Config) ->
     Id = maps:get(id, Config),
