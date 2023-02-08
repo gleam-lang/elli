@@ -7,7 +7,9 @@
     bad_service/1,
     start_log_spy/1,
     silence_default_handler/0,
-    as_request/1,
+    path/1,
+    headers/1,
+    body/1,
     get_spied_reports/1
 ]).
 
@@ -55,12 +57,23 @@ get_spied_reports(IdBinary)->
             )
     end.
 
-as_request(#req{method = Method, path = Path, headers = Headers, body = Body}) ->
-    BinaryPath = iolist_to_binary(lists:join(<<"/">>, [<<"">> | Path])),
-    %% not all fields are used in the tests
-    {ok, {request, Method, Headers, Body, x, x, x, BinaryPath, x}};
-as_request(_) ->
-    {error, [{decode_error, <<"a request tuple">>, <<"something else">>, []}]}.
+path(#req{path = Path}) ->
+    case Path of
+        undefined -> <<>>;
+        _ -> iolist_to_binary(lists:join(<<"/">>, [<<"">> | Path]))
+    end.
+
+headers(#req{headers = Headers}) ->
+    case Headers of
+        undefined -> [];
+        _ -> Headers
+    end.
+
+body(#req{body = Body}) ->
+    case Body of
+        undefined -> <<>>;
+        _ -> Body
+    end.
 
 log(LogEvent, Config) ->
     Id = maps:get(id, Config),
