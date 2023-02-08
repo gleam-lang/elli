@@ -44,5 +44,5 @@ get_host(Request) ->
         Host when is_binary(Host) -> Host
     end.
 
-mask(Request) ->
-    Request#req{headers = [], body = <<>>}.
+mask(#req{path = Path}) ->
+    #req{path = Path}.

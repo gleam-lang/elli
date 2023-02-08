@@ -1,4 +1,3 @@
-import gleam/bit_string
 import gleam/bit_builder.{BitBuilder}
 import gleam/dynamic.{DecodeError, Dynamic}
 import gleam/hackney
@@ -88,15 +87,13 @@ pub fn log_masks_request_headers_test() {
 
   assert [err] = get_spied_reports(spy_name)
 
-  assert Ok(logged_req) = get_request(err, Request)
-
   // check that we got the request back
-  logged_req.path
-  |> should.equal("/route/with/no/handler")
+  get_request(err, Request, path)
+  |> should.equal(Ok("/route/with/no/handler"))
 
   // but without the headers
-  logged_req.headers
-  |> should.equal([])
+  get_request(err, Request, headers)
+  |> should.equal(Ok([]))
 }
 
 pub fn log_masks_request_body_test() {
@@ -112,15 +109,13 @@ pub fn log_masks_request_body_test() {
 
   assert [err] = get_spied_reports(spy_name)
 
-  assert Ok(logged_req) = get_request(err, Request)
-
   // check that we got the request back
-  logged_req.path
-  |> should.equal("/route/with/no/handler")
+  get_request(err, Request, path)
+  |> should.equal(Ok("/route/with/no/handler"))
 
   // but without the body
-  logged_req.body
-  |> should.equal(bit_string.from_string(""))
+  get_request(err, Request, body)
+  |> should.equal(Ok(<<>>))
 }
 
 external fn start_log_spy(id: String) -> Nil =
@@ -173,13 +168,23 @@ fn list_length(
 fn get_request(
   report: Map(a, Dynamic),
   key: a,
-) -> Result(Request(BitString), List(DecodeError)) {
+  unwrap: fn(Dynamic) -> b,
+) -> Result(b, Nil) {
   map.get(report, key)
-  |> result.map_error(fn(_) { [] })
-  |> result.then(as_request)
+  |> result.map(unwrap)
 }
 
-external fn as_request(
-  something: Dynamic,
-) -> Result(Request(BitString), List(DecodeError)) =
-  "elli_logging_test_ffi" "as_request"
+// elli_logging_test_ffi:path replaces `undefined` with an empty string to
+// give us less type juggling in the tests.
+external fn path(Dynamic) -> String =
+  "elli_logging_test_ffi" "path"
+
+// elli_logging_test_ffi:headers replaces `undefined` with an empty list to
+// give us less type juggling in the tests.
+external fn headers(Dynamic) -> List(#(String, String)) =
+  "elli_logging_test_ffi" "headers"
+
+// elli_logging_test_ffi:body replaces `undefined` with an empty bitstring to
+// give us less type juggling in the tests.
+external fn body(Dynamic) -> BitString =
+  "elli_logging_test_ffi" "body"
