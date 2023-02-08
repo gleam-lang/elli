@@ -1,5 +1,7 @@
 -module(elli_logging_test_ffi).
 
+-include_lib("elli/include/elli.hrl").
+
 %% Test API
 -export([
     bad_service/1,
@@ -53,7 +55,7 @@ get_spied_reports(IdBinary)->
             )
     end.
 
-as_request({req, Method, _, _, _, Path, _, _, _, Headers, Body, _, _, _}) ->
+as_request(#req{method = Method, path = Path, headers = Headers, body = Body}) ->
     BinaryPath = iolist_to_binary(lists:join(<<"/">>, [<<"">> | Path])),
     %% not all fields are used in the tests
     {ok, {request, Method, Headers, Body, x, x, x, BinaryPath, x}};
