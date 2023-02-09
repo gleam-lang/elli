@@ -7,9 +7,6 @@
     bad_service/1,
     start_log_spy/1,
     silence_default_handler/0,
-    path/1,
-    headers/1,
-    body/1,
     get_spied_reports/1
 ]).
 
@@ -49,30 +46,12 @@ get_spied_reports(IdBinary)->
                 fun
                     (#{ level := Level, msg := {report, Report}}) ->
                         %% massage to make it easier to use in tests
-                        {true, Report#{level => atom_to_binary(Level)}};
+                        {true, {atom_to_binary(Level), Report}};
                     (_) ->
                         false
                 end,
                 LogEvents
             )
-    end.
-
-path(#req{path = Path}) ->
-    case Path of
-        undefined -> <<>>;
-        _ -> iolist_to_binary(lists:join(<<"/">>, [<<"">> | Path]))
-    end.
-
-headers(#req{headers = Headers}) ->
-    case Headers of
-        undefined -> [];
-        _ -> Headers
-    end.
-
-body(#req{body = Body}) ->
-    case Body of
-        undefined -> <<>>;
-        _ -> Body
     end.
 
 log(LogEvent, Config) ->
