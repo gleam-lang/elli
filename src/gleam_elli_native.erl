@@ -12,21 +12,24 @@ handle_event(request_error, [Request, Error, Stacktrace], _) ->
     ?LOG_ERROR(#{
         message => <<"request handler had a runtime error">>,
         error => Error,
-        request => mask(Request),
+        method => method(Request),
+        path => path(Request),
         stacktrace => Stacktrace
     });
 handle_event(request_throw, [Request, Exception, Stacktrace], _) ->
     ?LOG_ERROR(#{
         message => <<"request handler threw an exception">>,
         error => Exception,
-        request => mask(Request),
+        method => method(Request),
+        path => path(Request),
         stacktrace => Stacktrace
     });
 handle_event(request_exit, [Request, Exit, Stacktrace], _) ->
     ?LOG_ERROR(#{
         message => <<"request handler exited">>,
         error => Exit,
-        request => mask(Request),
+        method => method(Request),
+        path => path(Request),
         stacktrace => Stacktrace
     });
 handle_event(_, _, _) ->
@@ -44,5 +47,17 @@ get_host(Request) ->
         Host when is_binary(Host) -> Host
     end.
 
-mask(#req{path = Path}) ->
-    #req{path = Path}.
+path(#req{path = Path}) ->
+    erlang:iolist_to_binary(["/"] ++ lists:join("/", Path)).
+
+method(#req{method = Method}) ->
+    case Method of
+        'OPTIONS' -> options;
+        'GET' -> get;
+        'HEAD' -> head;
+        'POST' -> post;
+        'PUT' -> put;
+        'DELETE' -> delete;
+        'TRACE' -> trace;
+        _ -> Method
+    end.

@@ -1,7 +1,8 @@
 import gleam/bit_builder.{BitBuilder}
-import gleam/dynamic.{DecodeError, Dynamic}
+import gleam/dynamic.{DecodeError, Dynamic, unsafe_coerce}
+import gleam/erlang/charlist
 import gleam/hackney
-import gleam/http.{Get}
+import gleam/http.{Get, Method, Post, Put}
 import gleam/http/elli
 import gleam/http/request.{Request}
 import gleam/http/response.{Response}
@@ -22,14 +23,16 @@ pub fn log_throw_test() {
   start_log_spy(spy_name)
   silence_default_handler()
 
-  make_request(port, "/throw", "throw_value")
+  make_request(port, Get, "/throw", "throw_value")
   |> hackney.send
 
-  assert [throw] = get_spied_reports(spy_name)
+  assert [#(level, throw)] = get_spied_reports(spy_name)
 
-  assert Ok("error") = get_string(throw, Level)
+  assert "error" = level
   assert Ok("request handler threw an exception") = get_string(throw, Message)
   assert Ok("throw_value") = get_string(throw, Error)
+  assert Ok(Get) = get_method(throw, Method)
+  assert Ok("/throw") = get_string(throw, Path)
   assert Ok(throw_stack) = list_length(throw, Stacktrace)
   should.be_true(0 < throw_stack)
 }
@@ -42,14 +45,16 @@ pub fn log_error_test() {
   start_log_spy(spy_name)
   silence_default_handler()
 
-  make_request(port, "/error", "error_value")
+  make_request(port, Post, "/error", "error_value")
   |> hackney.send
 
-  assert [err] = get_spied_reports(spy_name)
+  assert [#(level, err)] = get_spied_reports(spy_name)
 
-  assert Ok("error") = get_string(err, Level)
+  assert "error" = level
   assert Ok("request handler had a runtime error") = get_string(err, Message)
   assert Ok("error_value") = get_string(err, Error)
+  assert Ok(Post) = get_method(err, Method)
+  assert Ok("/error") = get_string(err, Path)
   assert Ok(err_stack) = list_length(err, Stacktrace)
   should.be_true(0 < err_stack)
 }
@@ -62,60 +67,18 @@ pub fn log_exit_test() {
   start_log_spy(spy_name)
   silence_default_handler()
 
-  make_request(port, "/exit", "exit_value")
+  make_request(port, Put, "/exit", "exit_value")
   |> hackney.send
 
-  assert [exit] = get_spied_reports(spy_name)
+  assert [#(level, exit)] = get_spied_reports(spy_name)
 
-  assert Ok("error") = get_string(exit, Level)
+  assert "error" = level
   assert Ok("request handler exited") = get_string(exit, Message)
   assert Ok("exit_value") = get_string(exit, Error)
+  assert Ok(Put) = get_method(exit, Method)
+  assert Ok("/exit") = get_string(exit, Path)
   assert Ok(exit_stack) = list_length(exit, Stacktrace)
   should.be_true(0 < exit_stack)
-}
-
-pub fn log_masks_request_headers_test() {
-  let port = 4715
-  assert Ok(_) = elli.start(bad_service, on_port: port)
-
-  let spy_name = "log_masks_request_test"
-  start_log_spy(spy_name)
-  silence_default_handler()
-
-  make_request(port, "/route/with/no/handler", "dont_care")
-  |> hackney.send
-
-  assert [err] = get_spied_reports(spy_name)
-
-  // check that we got the request back
-  get_request(err, Request, path)
-  |> should.equal(Ok("/route/with/no/handler"))
-
-  // but without the headers
-  get_request(err, Request, headers)
-  |> should.equal(Ok([]))
-}
-
-pub fn log_masks_request_body_test() {
-  let port = 4716
-  assert Ok(_) = elli.start(bad_service, on_port: port)
-
-  let spy_name = "log_masks_request_body_test"
-  start_log_spy(spy_name)
-  silence_default_handler()
-
-  make_request(port, "/route/with/no/handler", "dont_care")
-  |> hackney.send
-
-  assert [err] = get_spied_reports(spy_name)
-
-  // check that we got the request back
-  get_request(err, Request, path)
-  |> should.equal(Ok("/route/with/no/handler"))
-
-  // but without the body
-  get_request(err, Request, body)
-  |> should.equal(Ok(<<>>))
 }
 
 external fn start_log_spy(id: String) -> Nil =
@@ -125,19 +88,21 @@ external fn silence_default_handler() -> Nil =
   "elli_logging_test_ffi" "silence_default_handler"
 
 type ReportKey {
-  Level
   Message
   Error
-  Request
+  Method
+  Path
   Stacktrace
 }
 
-external fn get_spied_reports(id: String) -> List(Map(ReportKey, Dynamic)) =
+external fn get_spied_reports(
+  id: String,
+) -> List(#(String, Map(ReportKey, Dynamic))) =
   "elli_logging_test_ffi" "get_spied_reports"
 
-fn make_request(port: Int, path: String, message: String) {
+fn make_request(port: Int, method: Method, path: String, message: String) {
   request.new()
-  |> request.set_method(Get)
+  |> request.set_method(method)
   |> request.set_path(path)
   |> request.set_query([#("message", message)])
   |> request.set_host("0.0.0.0")
@@ -165,26 +130,12 @@ fn list_length(
   |> result.map(list.length)
 }
 
-fn get_request(
+fn get_method(
   report: Map(a, Dynamic),
   key: a,
-  unwrap: fn(Dynamic) -> b,
-) -> Result(b, Nil) {
+) -> Result(Method, List(DecodeError)) {
   map.get(report, key)
-  |> result.map(unwrap)
+  |> result.map_error(fn(_) { [] })
+  // sorry about the unsafe_coerce but this is test code
+  |> result.then(fn(x) { Ok(unsafe_coerce(x)) })
 }
-
-// elli_logging_test_ffi:path replaces `undefined` with an empty string to
-// give us less type juggling in the tests.
-external fn path(Dynamic) -> String =
-  "elli_logging_test_ffi" "path"
-
-// elli_logging_test_ffi:headers replaces `undefined` with an empty list to
-// give us less type juggling in the tests.
-external fn headers(Dynamic) -> List(#(String, String)) =
-  "elli_logging_test_ffi" "headers"
-
-// elli_logging_test_ffi:body replaces `undefined` with an empty bitstring to
-// give us less type juggling in the tests.
-external fn body(Dynamic) -> BitString =
-  "elli_logging_test_ffi" "body"
