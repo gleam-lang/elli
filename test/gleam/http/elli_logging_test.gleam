@@ -1,6 +1,6 @@
 import gleam/bit_builder.{BitBuilder}
-import gleam/dynamic.{DecodeError, Dynamic, unsafe_coerce}
-import gleam/erlang/charlist
+import gleam/dynamic.{DecodeError, Dynamic}
+import gleam/erlang/atom.{Atom}
 import gleam/hackney
 import gleam/http.{Get, Method, Post, Put}
 import gleam/http/elli
@@ -31,7 +31,7 @@ pub fn log_throw_test() {
   assert "error" = level
   assert Ok("request handler threw an exception") = get_string(throw, Message)
   assert Ok("throw_value") = get_string(throw, Error)
-  assert Ok(Get) = get_method(throw, Method)
+  should.equal(get_method(throw, Method), atom_from_string("GET"))
   assert Ok("/throw") = get_string(throw, Path)
   assert Ok(throw_stack) = list_length(throw, Stacktrace)
   should.be_true(0 < throw_stack)
@@ -53,7 +53,7 @@ pub fn log_error_test() {
   assert "error" = level
   assert Ok("request handler had a runtime error") = get_string(err, Message)
   assert Ok("error_value") = get_string(err, Error)
-  assert Ok(Post) = get_method(err, Method)
+  should.equal(get_method(err, Method), atom_from_string("POST"))
   assert Ok("/error") = get_string(err, Path)
   assert Ok(err_stack) = list_length(err, Stacktrace)
   should.be_true(0 < err_stack)
@@ -75,7 +75,7 @@ pub fn log_exit_test() {
   assert "error" = level
   assert Ok("request handler exited") = get_string(exit, Message)
   assert Ok("exit_value") = get_string(exit, Error)
-  assert Ok(Put) = get_method(exit, Method)
+  should.equal(get_method(exit, Method), atom_from_string("PUT"))
   assert Ok("/exit") = get_string(exit, Path)
   assert Ok(exit_stack) = list_length(exit, Stacktrace)
   should.be_true(0 < exit_stack)
@@ -133,9 +133,16 @@ fn list_length(
 fn get_method(
   report: Map(a, Dynamic),
   key: a,
-) -> Result(Method, List(DecodeError)) {
+) -> Result(Atom, List(DecodeError)) {
   map.get(report, key)
   |> result.map_error(fn(_) { [] })
-  // sorry about the unsafe_coerce but this is test code
-  |> result.then(fn(x) { Ok(unsafe_coerce(x)) })
+  // This only covers the methods we use in the tests,
+  // notably not the binaries we get for unknown methods.
+  |> result.then(atom.from_dynamic)
+}
+
+// a convenience wrapper for the test comparisons
+fn atom_from_string(s: String) -> Result(Atom, List(DecodeError)) {
+  atom.from_string(s)
+  |> result.map_error(fn(_) { [] })
 }

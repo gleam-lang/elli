@@ -51,13 +51,4 @@ path(#req{path = Path}) ->
     erlang:iolist_to_binary(["/"] ++ lists:join("/", Path)).
 
 method(#req{method = Method}) ->
-    case Method of
-        'OPTIONS' -> options;
-        'GET' -> get;
-        'HEAD' -> head;
-        'POST' -> post;
-        'PUT' -> put;
-        'DELETE' -> delete;
-        'TRACE' -> trace;
-        _ -> Method
-    end.
+    Method.
