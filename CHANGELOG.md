@@ -1,6 +1,10 @@
 # Changelog
 
-## v2.0.0 - Unreleased
+## v2.1.0 - 2023-02-14
+
+- Crashes in the request handler are now logged.
+
+## v2.0.0 - 2022-09-10
 
 - Updated for `gleam_otp` v0.5.0.
 
