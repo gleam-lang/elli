@@ -1,5 +1,5 @@
 name = "gleam_elli"
-version = "2.1.0"
+version = "2.2.0"
 gleam = ">= 0.30.0"
 
 licences = ["Apache-2.0"]

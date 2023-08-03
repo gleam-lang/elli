@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.2.0 - 2023-08-03
+
+- Updated for Gleam v0.30.0.
+
 ## v2.1.0 - 2023-02-14
 
 - Crashes in the request handler are now logged.
