@@ -1,5 +1,7 @@
 name = "gleam_elli"
 version = "2.1.0"
+gleam = ">= 0.30.0"
+
 licences = ["Apache-2.0"]
 description = "Run Gleam HTTP services with the Elli web server"
 
@@ -17,4 +19,4 @@ elli = "~> 3.0"
 
 [dev-dependencies]
 gleeunit = "~> 0.1"
-gleam_hackney = "~> 0.2"
+gleam_hackney = "~> 1.0"

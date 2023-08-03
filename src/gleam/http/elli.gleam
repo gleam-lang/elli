@@ -12,7 +12,7 @@ import gleam/result
 import gleam/string
 import gleam/bit_builder.{BitBuilder}
 
-external type ElliRequest
+type ElliRequest
 
 type ElliResponse =
   #(Int, List(http.Header), BitBuilder)
@@ -23,23 +23,23 @@ type StartLinkOption {
   Port(Int)
 }
 
-external fn split(String, List(String)) -> List(String) =
-  "binary" "split"
+@external(erlang, "binary", "split")
+fn split(a: String, b: List(String)) -> List(String)
 
-external fn erl_start_link(List(StartLinkOption)) -> Result(Pid, Dynamic) =
-  "elli" "start_link"
+@external(erlang, "elli", "start_link")
+fn erl_start_link(a: List(StartLinkOption)) -> Result(Pid, Dynamic)
 
-external fn get_body(ElliRequest) -> BitString =
-  "elli_request" "body"
+@external(erlang, "elli_request", "body")
+fn get_body(a: ElliRequest) -> BitString
 
-external fn get_headers(ElliRequest) -> List(http.Header) =
-  "elli_request" "headers"
+@external(erlang, "elli_request", "headers")
+fn get_headers(a: ElliRequest) -> List(http.Header)
 
-external fn get_host(ElliRequest) -> String =
-  "gleam_elli_native" "get_host"
+@external(erlang, "gleam_elli_native", "get_host")
+fn get_host(a: ElliRequest) -> String
 
-external fn get_dynamic_method(ElliRequest) -> Dynamic =
-  "elli_request" "method"
+@external(erlang, "elli_request", "method")
+fn get_dynamic_method(a: ElliRequest) -> Dynamic
 
 fn get_method(req) {
   req
@@ -48,8 +48,8 @@ fn get_method(req) {
   |> result.unwrap(http.Get)
 }
 
-external fn get_dynamic_port(ElliRequest) -> Dynamic =
-  "elli_request" "port"
+@external(erlang, "elli_request", "port")
+fn get_dynamic_port(a: ElliRequest) -> Dynamic
 
 fn get_port(req) {
   req
@@ -58,8 +58,8 @@ fn get_port(req) {
   |> option.from_result
 }
 
-external fn get_dynamic_scheme(ElliRequest) -> Dynamic =
-  "elli_request" "scheme"
+@external(erlang, "elli_request", "scheme")
+fn get_dynamic_scheme(a: ElliRequest) -> Dynamic
 
 fn get_scheme(req) -> http.Scheme {
   let scheme =
@@ -74,11 +74,11 @@ fn get_scheme(req) -> http.Scheme {
   }
 }
 
-external fn get_query(ElliRequest) -> String =
-  "elli_request" "query_str"
+@external(erlang, "elli_request", "query_str")
+fn get_query(a: ElliRequest) -> String
 
-external fn get_raw_path(ElliRequest) -> String =
-  "elli_request" "raw_path"
+@external(erlang, "elli_request", "raw_path")
+fn get_raw_path(a: ElliRequest) -> String
 
 fn get_path(request: ElliRequest) -> String {
   let raw_path = get_raw_path(request)
@@ -88,8 +88,8 @@ fn get_path(request: ElliRequest) -> String {
   |> result.unwrap(raw_path)
 }
 
-external fn await_shutdown(process.Pid) -> Nil =
-  "gleam_elli_native" "await_shutdown"
+@external(erlang, "gleam_elli_native", "await_shutdown")
+fn await_shutdown(a: process.Pid) -> Nil
 
 fn convert_header_to_lowercase(header: http.Header) -> http.Header {
   pair.map_first(header, fn(key) { string.lowercase(key) })
