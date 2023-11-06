@@ -1,8 +1,8 @@
-import gleam/erlang/atom.{Atom}
-import gleam/dynamic.{Dynamic}
-import gleam/erlang/process.{Pid}
+import gleam/erlang/atom.{type Atom}
+import gleam/dynamic.{type Dynamic}
+import gleam/erlang/process.{type Pid}
 import gleam/http
-import gleam/http/service.{Service}
+import gleam/http/service.{type Service}
 import gleam/http/request.{Request}
 import gleam/http/response.{Response}
 import gleam/list
@@ -10,7 +10,7 @@ import gleam/option
 import gleam/pair
 import gleam/result
 import gleam/string
-import gleam/bit_builder.{BitBuilder}
+import gleam/bit_builder.{type BitBuilder}
 
 type ElliRequest
 
@@ -30,7 +30,7 @@ fn split(a: String, b: List(String)) -> List(String)
 fn erl_start_link(a: List(StartLinkOption)) -> Result(Pid, Dynamic)
 
 @external(erlang, "elli_request", "body")
-fn get_body(a: ElliRequest) -> BitString
+fn get_body(a: ElliRequest) -> BitArray
 
 @external(erlang, "elli_request", "headers")
 fn get_headers(a: ElliRequest) -> List(http.Header)
@@ -96,7 +96,7 @@ fn convert_header_to_lowercase(header: http.Header) -> http.Header {
 }
 
 fn service_to_elli_handler(
-  service: Service(BitString, BitBuilder),
+  service: Service(BitArray, BitBuilder),
 ) -> fn(ElliRequest) -> ElliResponse {
   fn(req) {
     let resp =
@@ -124,7 +124,7 @@ fn service_to_elli_handler(
 /// the current process you may want to use the `become` function instead.
 ///
 pub fn start(
-  service: Service(BitString, BitBuilder),
+  service: Service(BitArray, BitBuilder),
   on_port number: Int,
 ) -> Result(Pid, Dynamic) {
   [
@@ -141,7 +141,7 @@ pub fn start(
 /// shut down after successfully starting.
 ///
 pub fn become(
-  service: Service(BitString, BitBuilder),
+  service: Service(BitArray, BitBuilder),
   on_port number: Int,
 ) -> Result(Nil, Dynamic) {
   service

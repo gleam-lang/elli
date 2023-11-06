@@ -1,19 +1,19 @@
-import gleam/bit_builder.{BitBuilder}
-import gleam/dynamic.{DecodeError, Dynamic}
-import gleam/erlang/atom.{Atom}
+import gleam/bit_builder.{type BitBuilder}
+import gleam/dynamic.{type DecodeError, type Dynamic}
+import gleam/erlang/atom.{type Atom}
 import gleam/hackney
-import gleam/http.{Get, Method, Post, Put}
+import gleam/http.{type Method, Get, Post, Put}
 import gleam/http/elli
-import gleam/http/request.{Request}
-import gleam/http/response.{Response}
+import gleam/http/request.{type Request}
+import gleam/http/response.{type Response}
 import gleam/list
-import gleam/map.{Map}
+import gleam/map.{type Map}
 import gleam/result
 import gleeunit/should
 
 // Using FFI to make crashing in the request handler easy.
 @external(erlang, "elli_logging_test_ffi", "bad_service")
-fn bad_service(request request: Request(BitString)) -> Response(BitBuilder)
+fn bad_service(request request: Request(BitArray)) -> Response(BitBuilder)
 
 pub fn log_throw_test() {
   let port = 4712
