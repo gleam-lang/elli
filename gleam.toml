@@ -13,7 +13,7 @@ links = [
 
 [dependencies]
 gleam_erlang = "~> 0.23"
-gleam_stdlib = "~> 0.32"
+gleam_stdlib = "~> 0.36"
 gleam_http = "~> 3.0"
 gleam_otp = "~> 0.3"
 elli = "~> 3.0"

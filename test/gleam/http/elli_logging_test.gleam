@@ -1,4 +1,4 @@
-import gleam/bit_builder.{type BitBuilder}
+import gleam/bytes_builder.{type BytesBuilder}
 import gleam/dynamic.{type DecodeError, type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/hackney
@@ -7,13 +7,13 @@ import gleam/http/elli
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
 import gleam/list
-import gleam/map.{type Map}
+import gleam/dict.{type Dict}
 import gleam/result
 import gleeunit/should
 
 // Using FFI to make crashing in the request handler easy.
 @external(erlang, "elli_logging_test_ffi", "bad_service")
-fn bad_service(request request: Request(BitArray)) -> Response(BitBuilder)
+fn bad_service(request request: Request(BitArray)) -> Response(BytesBuilder)
 
 pub fn log_throw_test() {
   let port = 4712
@@ -98,7 +98,7 @@ type ReportKey {
 }
 
 @external(erlang, "elli_logging_test_ffi", "get_spied_reports")
-fn get_spied_reports(id id: String) -> List(#(String, Map(ReportKey, Dynamic)))
+fn get_spied_reports(id id: String) -> List(#(String, Dict(ReportKey, Dynamic)))
 
 fn make_request(port: Int, method: Method, path: String, message: String) {
   request.new()
@@ -112,29 +112,29 @@ fn make_request(port: Int, method: Method, path: String, message: String) {
 }
 
 fn get_string(
-  report: Map(a, Dynamic),
+  report: Dict(a, Dynamic),
   key: a,
 ) -> Result(String, List(DecodeError)) {
-  map.get(report, key)
+  dict.get(report, key)
   |> result.map_error(fn(_) { [] })
   |> result.then(dynamic.string)
 }
 
 fn list_length(
-  report: Map(a, Dynamic),
+  report: Dict(a, Dynamic),
   key: a,
 ) -> Result(Int, List(DecodeError)) {
-  map.get(report, key)
+  dict.get(report, key)
   |> result.map_error(fn(_) { [] })
   |> result.then(dynamic.shallow_list)
   |> result.map(list.length)
 }
 
 fn get_method(
-  report: Map(a, Dynamic),
+  report: Dict(a, Dynamic),
   key: a,
 ) -> Result(Atom, List(DecodeError)) {
-  map.get(report, key)
+  dict.get(report, key)
   |> result.map_error(fn(_) { [] })
   // This only covers the methods we use in the tests,
   // notably not the binaries we get for unknown methods.
