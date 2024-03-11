@@ -6,11 +6,11 @@ A Gleam HTTP service adapter for the Elli web server.
 import gleam/http/elli
 import gleam/http/request.{Request}
 import gleam/http/response.{Response}
-import gleam/bit_builder.{BitBuilder}
+import gleam/bytes_builder.{BytesBuilder}
 
 // Define a HTTP service
 //
-pub fn my_service(req: Request(BitString)) -> Response(BitBuilder) {
+pub fn my_service(req: Request(t)) -> Response(BytesBuilder) {
   let body = bit_builder.from_string("Hello, world!")
 
   response.new(200)
