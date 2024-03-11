@@ -10,12 +10,12 @@ import gleam/option
 import gleam/pair
 import gleam/result
 import gleam/string
-import gleam/bit_builder.{type BitBuilder}
+import gleam/bytes_builder.{type BytesBuilder}
 
 type ElliRequest
 
 type ElliResponse =
-  #(Int, List(http.Header), BitBuilder)
+  #(Int, List(http.Header), BytesBuilder)
 
 type StartLinkOption {
   Callback(Atom)
@@ -96,7 +96,7 @@ fn convert_header_to_lowercase(header: http.Header) -> http.Header {
 }
 
 fn service_to_elli_handler(
-  service: Service(BitArray, BitBuilder),
+  service: Service(BitArray, BytesBuilder),
 ) -> fn(ElliRequest) -> ElliResponse {
   fn(req) {
     let resp =
@@ -108,7 +108,7 @@ fn service_to_elli_handler(
         path: get_path(req),
         query: option.Some(get_query(req)),
         headers: get_headers(req)
-        |> list.map(convert_header_to_lowercase),
+          |> list.map(convert_header_to_lowercase),
         body: get_body(req),
       )
       |> service
@@ -124,7 +124,7 @@ fn service_to_elli_handler(
 /// the current process you may want to use the `become` function instead.
 ///
 pub fn start(
-  service: Service(BitArray, BitBuilder),
+  service: Service(BitArray, BytesBuilder),
   on_port number: Int,
 ) -> Result(Pid, Dynamic) {
   [
@@ -141,7 +141,7 @@ pub fn start(
 /// shut down after successfully starting.
 ///
 pub fn become(
-  service: Service(BitArray, BitBuilder),
+  service: Service(BitArray, BytesBuilder),
   on_port number: Int,
 ) -> Result(Nil, Dynamic) {
   service
