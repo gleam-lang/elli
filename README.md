@@ -1,5 +1,13 @@
 # Elli
 
+### Install
+
+```
+gleam add gleam_elli
+```
+
+### Example
+
 A Gleam HTTP service adapter for the Elli web server.
 
 ```gleam
