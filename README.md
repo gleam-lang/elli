@@ -3,7 +3,7 @@
 ### Install
 
 ```
-gleam add gleam_elli
+gleam add gleam_elli gleam_http
 ```
 
 ### Example
