@@ -1,15 +1,10 @@
 # Elli
 
-### Install
+A basic Gleam HTTP service adapter for the Elli web server.
 
 ```
 gleam add gleam_elli gleam_http
 ```
-
-### Example
-
-A Gleam HTTP service adapter for the Elli web server.
-
 ```gleam
 import gleam/http/elli
 import gleam/http/request.{Request}
