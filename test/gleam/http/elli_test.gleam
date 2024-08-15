@@ -1,9 +1,9 @@
-import gleam/http/elli
 import gleam/bytes_builder.{type BytesBuilder}
+import gleam/hackney
 import gleam/http.{Get, Head, Post}
+import gleam/http/elli
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
-import gleam/hackney
 
 pub fn echo_service(request: Request(BitArray)) -> Response(BytesBuilder) {
   let body = case request.body {
