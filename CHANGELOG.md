@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.4.1 - 2024-08-15
+
+- Warnings fixed.
+
 ## v2.4.0 - 2024-03-12
 
 - Updated for Gleam v1.0.0.

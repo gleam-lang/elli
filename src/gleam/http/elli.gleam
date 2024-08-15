@@ -1,16 +1,15 @@
-import gleam/erlang/atom.{type Atom}
+import gleam/bytes_builder.{type BytesBuilder}
 import gleam/dynamic.{type Dynamic}
+import gleam/erlang/atom.{type Atom}
 import gleam/erlang/process.{type Pid}
 import gleam/http
-import gleam/http/service.{type Service}
-import gleam/http/request.{Request}
-import gleam/http/response.{Response}
+import gleam/http/request.{type Request, Request}
+import gleam/http/response.{type Response, Response}
 import gleam/list
 import gleam/option
 import gleam/pair
 import gleam/result
 import gleam/string
-import gleam/bytes_builder.{type BytesBuilder}
 
 type ElliRequest
 
@@ -96,7 +95,7 @@ fn convert_header_to_lowercase(header: http.Header) -> http.Header {
 }
 
 fn service_to_elli_handler(
-  service: Service(BitArray, BytesBuilder),
+  service: fn(Request(BitArray)) -> Response(BytesBuilder),
 ) -> fn(ElliRequest) -> ElliResponse {
   fn(req) {
     let resp =
@@ -124,7 +123,7 @@ fn service_to_elli_handler(
 /// the current process you may want to use the `become` function instead.
 ///
 pub fn start(
-  service: Service(BitArray, BytesBuilder),
+  service: fn(Request(BitArray)) -> Response(BytesBuilder),
   on_port number: Int,
 ) -> Result(Pid, Dynamic) {
   [
@@ -141,7 +140,7 @@ pub fn start(
 /// shut down after successfully starting.
 ///
 pub fn become(
-  service: Service(BitArray, BytesBuilder),
+  service: fn(Request(BitArray)) -> Response(BytesBuilder),
   on_port number: Int,
 ) -> Result(Nil, Dynamic) {
   service

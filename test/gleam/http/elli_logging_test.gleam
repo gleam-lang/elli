@@ -1,4 +1,5 @@
 import gleam/bytes_builder.{type BytesBuilder}
+import gleam/dict.{type Dict}
 import gleam/dynamic.{type DecodeError, type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/hackney
@@ -7,7 +8,6 @@ import gleam/http/elli
 import gleam/http/request.{type Request}
 import gleam/http/response.{type Response}
 import gleam/list
-import gleam/dict.{type Dict}
 import gleam/result
 import gleeunit/should
 
@@ -23,8 +23,9 @@ pub fn log_throw_test() {
   start_log_spy(spy_name)
   silence_default_handler()
 
-  make_request(port, Get, "/throw", "throw_value")
-  |> hackney.send
+  let _ =
+    make_request(port, Get, "/throw", "throw_value")
+    |> hackney.send
 
   let assert [#(level, throw)] = get_spied_reports(spy_name)
 
@@ -46,8 +47,9 @@ pub fn log_error_test() {
   start_log_spy(spy_name)
   silence_default_handler()
 
-  make_request(port, Post, "/error", "error_value")
-  |> hackney.send
+  let _ =
+    make_request(port, Post, "/error", "error_value")
+    |> hackney.send
 
   let assert [#(level, err)] = get_spied_reports(spy_name)
 
@@ -69,8 +71,9 @@ pub fn log_exit_test() {
   start_log_spy(spy_name)
   silence_default_handler()
 
-  make_request(port, Put, "/exit", "exit_value")
-  |> hackney.send
+  let _ =
+    make_request(port, Put, "/exit", "exit_value")
+    |> hackney.send
 
   let assert [#(level, exit)] = get_spied_reports(spy_name)
 
