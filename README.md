@@ -7,14 +7,14 @@ gleam add gleam_elli gleam_http
 ```
 ```gleam
 import gleam/http/elli
-import gleam/http/request.{Request}
-import gleam/http/response.{Response}
-import gleam/bytes_builder.{BytesBuilder}
+import gleam/http/request.{type Request}
+import gleam/http/response.{type Response}
+import gleam/bytes_builder.{type BytesBuilder}
 
 // Define a HTTP service
 //
 pub fn my_service(req: Request(t)) -> Response(BytesBuilder) {
-  let body = bit_builder.from_string("Hello, world!")
+  let body = bytes_builder.from_string("Hello, world!")
 
   response.new(200)
   |> response.prepend_header("made-with", "Gleam")
