@@ -1,4 +1,4 @@
-import gleam/bytes_builder.{type BytesBuilder}
+import gleam/bytes_tree.{type BytesTree}
 import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/erlang/process.{type Pid}
@@ -14,7 +14,7 @@ import gleam/string
 type ElliRequest
 
 type ElliResponse =
-  #(Int, List(http.Header), BytesBuilder)
+  #(Int, List(http.Header), BytesTree)
 
 type StartLinkOption {
   Callback(Atom)
@@ -95,7 +95,7 @@ fn convert_header_to_lowercase(header: http.Header) -> http.Header {
 }
 
 fn service_to_elli_handler(
-  service: fn(Request(BitArray)) -> Response(BytesBuilder),
+  service: fn(Request(BitArray)) -> Response(BytesTree),
 ) -> fn(ElliRequest) -> ElliResponse {
   fn(req) {
     let resp =
@@ -123,7 +123,7 @@ fn service_to_elli_handler(
 /// the current process you may want to use the `become` function instead.
 ///
 pub fn start(
-  service: fn(Request(BitArray)) -> Response(BytesBuilder),
+  service: fn(Request(BitArray)) -> Response(BytesTree),
   on_port number: Int,
 ) -> Result(Pid, Dynamic) {
   [
@@ -140,7 +140,7 @@ pub fn start(
 /// shut down after successfully starting.
 ///
 pub fn become(
-  service: fn(Request(BitArray)) -> Response(BytesBuilder),
+  service: fn(Request(BitArray)) -> Response(BytesTree),
   on_port number: Int,
 ) -> Result(Nil, Dynamic) {
   service

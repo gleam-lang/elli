@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.4.2 - 2024-11-19
+
+- Updated for `gleam_stdlib` v0.42.0.
+
 ## v2.4.1 - 2024-08-15
 
 - Warnings fixed.

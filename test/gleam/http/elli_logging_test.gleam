@@ -1,4 +1,4 @@
-import gleam/bytes_builder.{type BytesBuilder}
+import gleam/bytes_tree.{type BytesTree}
 import gleam/dict.{type Dict}
 import gleam/dynamic.{type DecodeError, type Dynamic}
 import gleam/erlang/atom.{type Atom}
@@ -13,7 +13,7 @@ import gleeunit/should
 
 // Using FFI to make crashing in the request handler easy.
 @external(erlang, "elli_logging_test_ffi", "bad_service")
-fn bad_service(request request: Request(BitArray)) -> Response(BytesBuilder)
+fn bad_service(request request: Request(BitArray)) -> Response(BytesTree)
 
 pub fn log_throw_test() {
   let port = 4712

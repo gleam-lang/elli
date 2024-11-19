@@ -1,5 +1,5 @@
 name = "gleam_elli"
-version = "2.4.1"
+version = "2.4.2"
 gleam = ">= 0.32.0"
 
 licences = ["Apache-2.0"]
@@ -13,7 +13,7 @@ links = [
 
 [dependencies]
 gleam_erlang = "~> 0.23"
-gleam_stdlib = "~> 0.36"
+gleam_stdlib = "~> 0.42"
 gleam_http = "~> 3.0"
 gleam_otp = "~> 0.3"
 elli = "~> 3.0"
