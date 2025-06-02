@@ -1,6 +1,7 @@
 import gleam/bytes_tree.{type BytesTree}
 import gleam/dict.{type Dict}
-import gleam/dynamic.{type DecodeError, type Dynamic}
+import gleam/dynamic.{type Dynamic}
+import gleam/dynamic/decode.{type DecodeError}
 import gleam/erlang/atom.{type Atom}
 import gleam/hackney
 import gleam/http.{type Method, Get, Post, Put}
@@ -120,7 +121,7 @@ fn get_string(
 ) -> Result(String, List(DecodeError)) {
   dict.get(report, key)
   |> result.map_error(fn(_) { [] })
-  |> result.then(dynamic.string)
+  |> result.then(decode.run(_, decode.string))
 }
 
 fn list_length(
@@ -129,7 +130,7 @@ fn list_length(
 ) -> Result(Int, List(DecodeError)) {
   dict.get(report, key)
   |> result.map_error(fn(_) { [] })
-  |> result.then(dynamic.shallow_list)
+  |> result.then(decode.run(_, decode.list(decode.dynamic)))
   |> result.map(list.length)
 }
 

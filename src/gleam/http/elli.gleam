@@ -1,5 +1,6 @@
 import gleam/bytes_tree.{type BytesTree}
 import gleam/dynamic.{type Dynamic}
+import gleam/dynamic/decode
 import gleam/erlang/atom.{type Atom}
 import gleam/erlang/process.{type Pid}
 import gleam/http
@@ -22,6 +23,18 @@ type StartLinkOption {
   Port(Int)
 }
 
+type ElliMethod {
+  Get
+  Post
+  Head
+  Put
+  Delete
+  Trace
+  Connect
+  Options
+  Patch
+}
+
 @external(erlang, "binary", "split")
 fn split(a: String, b: List(String)) -> List(String)
 
@@ -37,14 +50,23 @@ fn get_headers(a: ElliRequest) -> List(http.Header)
 @external(erlang, "gleam_elli_native", "get_host")
 fn get_host(a: ElliRequest) -> String
 
-@external(erlang, "elli_request", "method")
-fn get_dynamic_method(a: ElliRequest) -> Dynamic
+@external(erlang, "gleam_elli_native", "get_method")
+fn get_elli_method(a: ElliRequest) -> Result(ElliMethod, Nil)
 
-fn get_method(req) {
-  req
-  |> get_dynamic_method
-  |> http.method_from_dynamic
-  |> result.unwrap(http.Get)
+fn get_method(req) -> http.Method {
+  case get_elli_method(req) {
+    Ok(Trace) -> http.Trace
+    Ok(Put) -> http.Put
+    Ok(Post) -> http.Post
+    Ok(Patch) -> http.Patch
+    Ok(Options) -> http.Options
+    Ok(Head) -> http.Head
+    Ok(Get) -> http.Get
+    Ok(Delete) -> http.Delete
+    Ok(Connect) -> http.Connect
+    // FIXME: Don't just default, ensure this isn't reachable.
+    _ -> http.Other("unknown")
+  }
 }
 
 @external(erlang, "elli_request", "port")
@@ -53,7 +75,7 @@ fn get_dynamic_port(a: ElliRequest) -> Dynamic
 fn get_port(req) {
   req
   |> get_dynamic_port
-  |> dynamic.int
+  |> decode.run(decode.int)
   |> option.from_result
 }
 
@@ -64,7 +86,7 @@ fn get_scheme(req) -> http.Scheme {
   let scheme =
     req
     |> get_dynamic_scheme
-    |> dynamic.string
+    |> decode.run(decode.string)
     |> result.unwrap("")
     |> string.lowercase
   case scheme {
@@ -72,6 +94,20 @@ fn get_scheme(req) -> http.Scheme {
     _ -> http.Http
   }
 }
+
+// pub fn method_from_dynamic(
+//   value: Dynamic,
+// ) -> Result(Method, List(decode.DecodeError)) {
+//   case do_method_from_dynamic(value) {
+//     Ok(method) -> Ok(method)
+//     Error(_) ->
+//       Error([decode.DecodeError("HTTP method", dynamic.classify(value), [])])
+//   }
+// }
+
+// @target(erlang)
+// @external(erlang, "gleam_http_native", "decode_method")
+// fn do_method_from_dynamic(a: Dynamic) -> Result(ElliMethod, nil)
 
 @external(erlang, "elli_request", "query_str")
 fn get_query(a: ElliRequest) -> String

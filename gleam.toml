@@ -1,6 +1,6 @@
 name = "gleam_elli"
-version = "2.4.2"
-gleam = ">= 1.4.0"
+version = "3.0.0"
+gleam = ">= 1.10.0"
 
 licences = ["Apache-2.0"]
 description = "Run Gleam HTTP services with the Elli web server"
@@ -12,10 +12,10 @@ links = [
 ]
 
 [dependencies]
-gleam_erlang = "~> 0.23"
-gleam_stdlib = "~> 0.42"
-gleam_http = "~> 3.0"
-gleam_otp = "~> 0.3"
+gleam_erlang = ">= 0.34.0 and < 1.0.0"
+gleam_otp = ">= 0.16.1 and < 1.0.0"
+gleam_stdlib = ">= 0.44.0 and < 2.0.0"
+gleam_http = ">= 4.0.0 and < 5.0.0"
 elli = "~> 3.0"
 
 [dev-dependencies]
