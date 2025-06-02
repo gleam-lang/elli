@@ -23,18 +23,6 @@ type StartLinkOption {
   Port(Int)
 }
 
-type ElliMethod {
-  Get
-  Post
-  Head
-  Put
-  Delete
-  Trace
-  Connect
-  Options
-  Patch
-}
-
 @external(erlang, "binary", "split")
 fn split(a: String, b: List(String)) -> List(String)
 
@@ -51,23 +39,7 @@ fn get_headers(a: ElliRequest) -> List(http.Header)
 fn get_host(a: ElliRequest) -> String
 
 @external(erlang, "gleam_elli_native", "get_method")
-fn get_elli_method(a: ElliRequest) -> Result(ElliMethod, Nil)
-
-fn get_method(req) -> http.Method {
-  case get_elli_method(req) {
-    Ok(Trace) -> http.Trace
-    Ok(Put) -> http.Put
-    Ok(Post) -> http.Post
-    Ok(Patch) -> http.Patch
-    Ok(Options) -> http.Options
-    Ok(Head) -> http.Head
-    Ok(Get) -> http.Get
-    Ok(Delete) -> http.Delete
-    Ok(Connect) -> http.Connect
-    // FIXME: Don't just default, ensure this isn't reachable.
-    _ -> http.Other("unknown")
-  }
-}
+fn get_method(a: ElliRequest) -> http.Method
 
 @external(erlang, "elli_request", "port")
 fn get_dynamic_port(a: ElliRequest) -> Dynamic

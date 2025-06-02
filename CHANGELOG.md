@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.0.0 - 2025-06-01
+
+- Updated for `gleam_stdlib` v0.60.0.
+- Updated for `gleam_http` v4.0.0.
+
 ## v2.4.2 - 2024-11-19
 
 - Updated for `gleam_stdlib` v0.42.0.

@@ -49,16 +49,17 @@ get_host(Request) ->
 
 get_method(#req{method = Method}) ->
 	case Method of
-		'CONNECT'     -> {ok, connect};
-		'DELETE'      -> {ok, delete};
-		'GET'         -> {ok, get};
-		'HEAD'        -> {ok, head};
-		'OPTIONS'     -> {ok, options};
-		'PATCH'       -> {ok, patch};
-		'POST'        -> {ok, post};
-		'PUT'         -> {ok, put};
-		'TRACE'       -> {ok, trace};
-		_ -> {error, nil}
+		'CONNECT'           -> connect;
+		'DELETE'            -> delete;
+		'GET'               -> get;
+		'HEAD'              -> head;
+		'OPTIONS'           -> options;
+		'PATCH'             -> patch;
+		'POST'              -> post;
+		'PUT'               -> put;
+		'TRACE'             -> trace;
+		M when is_atom(M)   -> {other, string:lowercase(erlang:atom_to_binary(M))};
+		M when is_binary(M) -> {other, string:lowercase(M)}
 	end.
 	
 path(#req{path = Path}) ->
