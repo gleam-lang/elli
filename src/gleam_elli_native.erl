@@ -3,7 +3,7 @@
 -include_lib("kernel/include/logger.hrl").
 -include_lib("elli/include/elli.hrl").
 
--export([handle/2, handle_event/3, await_shutdown/1, get_host/1]).
+-export([handle/2, handle_event/3, await_shutdown/1, get_host/1, get_method/1]).
 
 handle(Req, Handler) ->
     Handler(Req).
@@ -47,6 +47,20 @@ get_host(Request) ->
         Host when is_binary(Host) -> Host
     end.
 
+get_method(#req{method = Method}) ->
+	case Method of
+		'CONNECT'     -> {ok, connect};
+		'DELETE'      -> {ok, delete};
+		'GET'         -> {ok, get};
+		'HEAD'        -> {ok, head};
+		'OPTIONS'     -> {ok, options};
+		'PATCH'       -> {ok, patch};
+		'POST'        -> {ok, post};
+		'PUT'         -> {ok, put};
+		'TRACE'       -> {ok, trace};
+		_ -> {error, nil}
+	end.
+	
 path(#req{path = Path}) ->
     erlang:iolist_to_binary(["/"] ++ lists:join("/", Path)).
 
